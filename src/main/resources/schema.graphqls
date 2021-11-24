@@ -4,3 +4,8 @@ type EventDto{
     title:String
     description:String
 }
+
+input InputEventQuery{
+    title: String
+    category: String
+}

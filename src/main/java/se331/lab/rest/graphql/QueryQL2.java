@@ -3,20 +3,21 @@ package se331.lab.rest.graphql;
 import graphql.kickstart.tools.GraphQLQueryResolver;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
+import se331.lab.rest.dao.EventDao;
 import se331.lab.rest.entity.Event;
 import se331.lab.rest.entity.EventDTO;
 import se331.lab.rest.service.EventService;
+import se331.lab.rest.util.LabMapper;
 
 import java.util.List;
 import java.util.stream.Collectors;
+
 @Component
 public class QueryQL2 implements GraphQLQueryResolver {
     @Autowired
     EventService eventService;
-    //EventDao eventDao;
     List<EventDTO> getEvents(){
-        List<Event> events = eventService.getEvents(10,0).getContent();
+        List<Event> events = eventService.getEvents(10,1).getContent();
         return events.stream().map(event -> EventDTO.builder()
                 .id(event.getId())
                 .category(event.getCategory())
@@ -24,6 +25,28 @@ public class QueryQL2 implements GraphQLQueryResolver {
                 .title(event.getTitle())
                 .description(event.getDescription())
                 .build()).collect(Collectors.toList());
-        }
+    }
 
+    EventDTO getEventById(Long id){
+        Event event = eventService.getEvent(id);
+        return EventDTO.builder()
+                .id(event.getId())
+                .category(event.getCategory())
+                .time(event.getTime())
+                .title(event.getTitle())
+                .description(event.getDescription())
+                .build();
+    }
+
+    public List<EventDTO> getEventByTitleAndCat(EventQuery query){
+        List<Event> events = eventService.getEventByTitleAndCat(query);
+        return events.stream().map(
+                output -> EventDTO.builder()
+                        .id(output.getId())
+                        .title(output.getTitle())
+                        .category(output.getCategory())
+                        .description(output.getDescription())
+                        .build()
+        ).collect(Collectors.toList());
+    }
 }
